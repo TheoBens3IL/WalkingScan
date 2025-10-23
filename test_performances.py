@@ -78,21 +78,26 @@ def extract_file_info(filename):
     Extrait les infos du nom de fichier: Data_pXXX_IDTest_Y.csv ou Data_PXXX_IDTest_Y.csv
     Retourne: (participant_id, id_test, essai)
     """
-    # Pattern flexible : accepte p ou P, avec ou sans zéros initiaux
-    # Gère aussi les espaces invisibles comme le caractère zero-width space
-    pattern = r'Data_[Pp](\d+)[_\s\u200B]+([^_\s\u200B]+)(?:[_\s\u200B]+(\d+))?\.csv'
-    match = re.search(pattern, filename)
-    
+    # Remove common zero-width / invisible characters that may appear in filenames
+    fname = re.sub(r'[\u200B\u200C\u200D\uFEFF]', '', filename)
+
+    # Pattern flexible:
+    # - accepte p ou P
+    # - autorise une lettre optionnelle (ex: 'a' pour âgés) entre le p et le numéro
+    # - accepte séparateurs '_' ou espaces ou '-' et gère l'essai optionnel
+    pattern = r'Data_[Pp](?:[A-Za-z]?)(\d+)[_\s\-]*([^_\s\.]+)(?:[_\s\-]+(\d+))?\.csv'
+    match = re.search(pattern, fname)
+
     if match:
         participant = match.group(1)
         id_test = match.group(2).strip()
         essai = int(match.group(3)) if match.group(3) else 1
-        
-        # Formatter participant_id comme dans la BDD: P001, P002, etc. (sans le A)
+
+        # Formatter participant_id comme dans la BDD: P001, P002, etc.
         participant_id = f"P{participant.zfill(3)}"
-        
+
         return participant_id, id_test, essai
-    
+
     return None, None, None
 
 def test_performance(dataset_dir, bdd_path):

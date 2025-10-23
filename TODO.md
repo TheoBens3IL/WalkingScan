@@ -1,3 +1,6 @@
+**Lien JIRA :**
+https://3il-team-mmo0iymr.atlassian.net/jira/software/projects/SCRUM/boards/1
+
 **Python**
 - nbr de pas
 - longueur de pas
@@ -18,6 +21,8 @@ Idée pour détetion de pas basé sur l'accéléromètre
 - filtre passe-bas
 - détecter pics de la magnitude
 
+<br>
+
 ___
 **Idées perspectives**
 
@@ -29,18 +34,24 @@ ___
   - On lui donne la méthode d'extraction de pas (variation de la dérivée) et son objectif est de déterminer le seuil idéal pour le filtre (et accessoirement quel filtre) en fonction de la courbe de marche en PosY
   - Extraire lui-même les paramètres de marche sans donner d'indication, simplement en l'entrainant sur le dataset. 
 
+<br>
+
 ___
 
 **Questions pour Flavie**
 - Est-ce que les paramètres longueur et nbr de pas + vitesse suffisent réllement à détecter si une personne va tomber ou non ? Je pencherai plutot sur les données à analyser RotX,Y,Z 
 - On rencontre une limite 
 
+<br>
+
 ___
 
 **Questionnements**
 - Pourquoi est-ce que chaque courbe au départ diminue et remonte à la fin sur l'axe y
 
+<br>
 
 ____
 **A faire**
-- faire un script d'analyse du taux de bonne réponse en fonction de la BDD correspondant à chaque fichier
+- [X] faire un script d'analyse du taux de bonne réponse en fonction de la BDD correspondant à chaque fichier
+- [ ] Comprendre pourquoi le taux de réussite est si bas
