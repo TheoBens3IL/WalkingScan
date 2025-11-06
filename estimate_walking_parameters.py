@@ -6,12 +6,13 @@ from scipy.signal import medfilt, savgol_filter
 from scipy.ndimage import gaussian_filter1d
 
 from utils import resolve_path, plot_position_over_time, plot_position_filtered_over_time, plot_y_over_z
+from bdd_utils import get_real_steps_for_file
 
 # Dossier contenant les CSV
 DATASET_DIR = os.path.join(os.path.dirname(__file__), 'dataset')
 DATASET_LABELIZED_DIR = os.path.join(os.path.dirname(__file__), 'dataset_labelized')
 
-def estimate_walking_parameters(filename, smoothing_method='gaussian', smoothing_kwargs=None, plot=True, print_results=True):
+def estimate_walking_parameters(filename, smoothing_method='gaussian', smoothing_kwargs=None, plot=True, print_results=True, skip_rows: int = 0):
     """
     Estime :
     - le nombre de pas
@@ -24,17 +25,29 @@ def estimate_walking_parameters(filename, smoothing_method='gaussian', smoothing
     # match = re.search(r'(\d+)[-_]?pas', filename, re.IGNORECASE)
     # real_steps = int(match.group(1)) if match else None
 
+    # ================================================================ #
+    # ==================== EXTRACTION DES DONNÉES ==================== #
+    # ================================================================ #
+
     # Dataset
     filepath = resolve_path(filename)
     df = pd.read_csv(filepath, sep=';')
+
+    # Optionnel : supprimer les premières lignes de données (après l'en-tête)
+    if skip_rows and skip_rows > 0:
+        df = df.iloc[skip_rows:].reset_index(drop=True)
+        if df.empty:
+            if print_results:
+                print(f"Après suppression des {skip_rows} premières lignes, pas de données disponibles.")
+            return None
 
     # Conversion sûre en float, en gérant les espaces et caractères parasites
     for col in ["ElapsedTime", "HeadPosition_X", "HeadPosition_Y", "HeadPosition_Z"]:
         df[col] = (
             df[col]
             .astype(str)
-            .str.strip()                      # retire espaces
-            .str.replace(",", ".", regex=False)  # virgule → point
+            .str.strip()                                   # retire espaces
+            .str.replace(",", ".", regex=False)            # virgule → point
             .str.replace(r"[^0-9\.\-eE]", "", regex=True)  # supprime tout autre caractère
         )
         df[col] = pd.to_numeric(df[col], errors="coerce")  # force conversion en float
@@ -49,11 +62,9 @@ def estimate_walking_parameters(filename, smoothing_method='gaussian', smoothing
     x = df["HeadPosition_X"].values
     z = df["HeadPosition_Z"].values
 
-    # Extraire uniquement les ligne de 0 à 200
-    time = time[0:530]
-    y = y[0:530]
-    x = x[0:530]
-    z = z[0:530]
+    # ================================================================ #
+    # ==================== TRAITEMENT DES DONNÉES ==================== #
+    # ================================================================ #
 
     # Données lissées (enlever le bruit de mesure)
     smoothing_kwargs = smoothing_kwargs or {}
@@ -63,13 +74,17 @@ def estimate_walking_parameters(filename, smoothing_method='gaussian', smoothing
     # Dérivée des données lissées
     dy_t = np.gradient(y_lisse, time)
 
+    # ================================================================ #
+    # ==================== DÉTECTION DES PAS ========================= #
+    # ================================================================ #
+
     # Détection des points où la dérivée passe de négative à positive (minimums locaux) : correspond au moment où le pied touche le sol
     extremums = np.where((np.diff(np.sign(dy_t)) > 0))[0]
     # print("nbr de pas : ", len(extremums)-1)
 
-    # Vérifier que la distance en x,z entre deux extremums successifs est significative (ex: > 0.15m)
+    # Vérifier que la distance en x,z entre deux extremums successifs est significative (ex: > 0.10m)
     valid_extremums = [extremums[0]]
-    min_step_distance = 0.15  # m
+    min_step_distance = 0.10  # m
     for i in range(1, len(extremums)):
         idx_prev = extremums[i-1]
         idx_cur = extremums[i]
@@ -82,23 +97,32 @@ def estimate_walking_parameters(filename, smoothing_method='gaussian', smoothing
     if print_results:
         print(f"Nombre de pas détectés (avec distance > {min_step_distance}m) : {len(valid_extremums)}")
 
+    # ================================================================ #
+    # ==================== DÉTECTION DES VIRAGES ====================== #
+    # ================================================================ #
+
     # Détecter les virages (toujours nécessaire pour les métriques)
     turn_intervals = detect_turns(x, z, valid_extremums, time, angle_threshold_deg=30.0)
 
     # Affichage des données brutes, lissées et extremums
     if plot :
+        # récupérer le nombre de pas réel depuis la BDD si disponible
+        real_steps = get_real_steps_for_file(filepath)
+
         plt.figure(figsize=(12, 4))
         plt.plot(time, y, label='Données brutes')
         plt.plot(time, y_lisse, label='Données lissées')
-        plt.scatter(time[valid_extremums], y_lisse[valid_extremums], color='red', label='Extremums')
-        # Créer le titre avec le nombre de pas réel et détecté
-        # title = f"Analyse de la marche - {filename}"
-        # if real_steps is not None:
-        #     title += f"\nPas réels: {real_steps} | Pas détectés: {len(valid_extremums)}"
-        # else:
-        #     title += f"\nPas détectés: {len(valid_extremums)}"
-        # plt.title(title)
-        
+        if len(valid_extremums) > 0:
+            plt.scatter(time[valid_extremums], y_lisse[valid_extremums], color='red', label='Extremums')
+
+        # Titre : nom du fichier (ligne 1) puis "Pas réels | Pas détectés" (ligne 2)
+        filename_only = os.path.basename(filepath)
+        steps_title = f"Pas détectés: {len(valid_extremums)}"
+        if real_steps is not None:
+            steps_title = f"Pas réels: {real_steps} | {steps_title}"
+        full_title = f"{filename_only}\n{steps_title}"
+        plt.title(full_title)
+
         plt.legend()
         plt.xlabel('Temps (s)')
         plt.ylabel('Position Y (m)')
@@ -106,6 +130,10 @@ def estimate_walking_parameters(filename, smoothing_method='gaussian', smoothing
         # Colorier les virages en fond
         for (t0, t1) in turn_intervals:
             plt.axvspan(t0, t1, color='orange', alpha=0.3)
+
+    # ====================================================================== #
+    # ============= CALCUL DES AUTRES MÉTRIQUES DE MARCHE ================== #
+    # ====================================================================== #
 
     # Calcul de la distance totale parcourue en X
     # Calculer la distance projetée sur le plan XZ (distance horizontale)
@@ -162,7 +190,7 @@ def estimate_walking_parameters(filename, smoothing_method='gaussian', smoothing
 
     # retourner un dictionnaire de métriques pour réutilisation
     metrics = {
-        'n_steps': max(len(extremums)-1, 0),
+        'n_steps': max(len(valid_extremums), 0),
         'total_distance': total_distance,
         'step_lengths': step_lengths,
         'step_speeds': step_speeds,

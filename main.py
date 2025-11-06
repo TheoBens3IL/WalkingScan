@@ -24,10 +24,8 @@ def prompt_user(prompt: str) -> str:
         return "q"  # quit if input stream closes
 
 def main():
-
-    # test one file
-    estimate_walking_parameters(str(CURRENT_DIR / "dataset_sorted" / "jeunes" / "Data_p030​_TUG1_3.csv"))
-
+    """Main function to test walking parameter estimation on dataset files."""
+    
     # Verify dataset directory exists
     if not DATASET_DIR.exists():
         print(f"Dossier introuvable: {DATASET_DIR}")

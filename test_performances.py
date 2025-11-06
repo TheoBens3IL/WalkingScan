@@ -7,8 +7,8 @@ from estimate_walking_parameters import estimate_walking_parameters
 
 # Configuration
 CURRENT_DIR = Path(__file__).resolve().parent
-DATASET_DIR = CURRENT_DIR / "dataset_sorted" / "jeunes"
-# DATASET_DIR = CURRENT_DIR / "dataset_sorted" / "âgés"
+# DATASET_DIR = CURRENT_DIR / "dataset_sorted" / "jeunes"
+DATASET_DIR = CURRENT_DIR / "dataset_sorted" / "âgés"
 BDD_JEUNES = CURRENT_DIR / "dataset_sorted" / "BDD_Jeunes_E1.csv"
 BDD_AGES = CURRENT_DIR / "dataset_sorted" / "BDD_Ages_E1.csv"
 

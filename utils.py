@@ -74,6 +74,9 @@ def resolve_path(filename: str) -> str:
             return (2, len(p))
         matches.sort(key=rank)
 
+    # Afficher le chemin trouvé pour le fichier
+    print(f"Chemin trouvé pour {filename}: {matches[0]}")
+
     return matches[0]
 
 
