@@ -16,34 +16,6 @@ def test_estimate_walking_parameters(filename, skip_rows=0):
 
 
 if __name__ == "__main__":
-    # file = "Data_p031​_TUG1_2.csv"
-    # test_estimate_walking_parameters(file)
 
-    # file = "Data_p022​_F8W1.csv"
-    # test_estimate_walking_parameters(file)
-
-    # file = "Data_p030​_TUG1.csv"
-    # test_estimate_walking_parameters(file)
-
-    # file = "Data_p031​_F8W2_2.csv"
-    # test_estimate_walking_parameters(file)
-
-    # file = "Data_p003​_TUG2_3.csv"
-    # test_estimate_walking_parameters(file)
-
-    # file = "Data_pa034​_TUG2.csv"
-    # test_estimate_walking_parameters(file)
-
-    # +9
-    # file = "Data_p026​_Marche.csv"
-    # test_estimate_walking_parameters(file)
-
-    # +3
-    # file = "Data_p035​_F8W2_3.csv"
-    # test_estimate_walking_parameters(file, skip_rows=3)
-
-    # file = "Data_PA001​_FO1.csv"
-    # test_estimate_walking_parameters(file)
-
-    file = "Data_PA001​_TUG2.csv"
+    file = "Data_p020​_Marche_3.csv"
     test_estimate_walking_parameters(file)
