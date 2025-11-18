@@ -12,7 +12,7 @@ from bdd_utils import get_real_steps_for_file
 DATASET_DIR = os.path.join(os.path.dirname(__file__), 'dataset')
 DATASET_LABELIZED_DIR = os.path.join(os.path.dirname(__file__), 'dataset_labelized')
 
-def estimate_walking_parameters(filename, smoothing_method='gaussian', smoothing_kwargs=None, plot=True, print_results=True, skip_rows: int = 0):
+def estimate_walking_parameters(filename, smoothing_method='passe-bas', smoothing_kwargs=None, plot=True, print_results=True, skip_rows: int = 0):
     """
     Estime :
     - le nombre de pas

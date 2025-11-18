@@ -28,8 +28,8 @@ if __name__ == "__main__":
     # file = "Data_p031​_F8W2_2.csv"
     # test_estimate_walking_parameters(file)
 
-    file = "Data_p003​_TUG2_3.csv"
-    test_estimate_walking_parameters(file)
+    # file = "Data_p003​_TUG2_3.csv"
+    # test_estimate_walking_parameters(file)
 
     # file = "Data_pa034​_TUG2.csv"
     # test_estimate_walking_parameters(file)
@@ -39,5 +39,11 @@ if __name__ == "__main__":
     # test_estimate_walking_parameters(file)
 
     # +3
-    file = "Data_p035​_F8W2_3.csv"
-    test_estimate_walking_parameters(file, skip_rows=3)
+    # file = "Data_p035​_F8W2_3.csv"
+    # test_estimate_walking_parameters(file, skip_rows=3)
+
+    # file = "Data_PA001​_FO1.csv"
+    # test_estimate_walking_parameters(file)
+
+    file = "Data_PA001​_TUG2.csv"
+    test_estimate_walking_parameters(file)

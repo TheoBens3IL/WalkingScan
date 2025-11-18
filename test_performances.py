@@ -7,8 +7,8 @@ from estimate_walking_parameters import estimate_walking_parameters
 
 # Configuration
 CURRENT_DIR = Path(__file__).resolve().parent
-# DATASET_DIR = CURRENT_DIR / "dataset_sorted" / "jeunes"
-DATASET_DIR = CURRENT_DIR / "dataset_sorted" / "âgés"
+DATASET_DIR = CURRENT_DIR / "dataset_sorted" / "jeunes"
+# DATASET_DIR = CURRENT_DIR / "dataset_sorted" / "âgés"
 BDD_JEUNES = CURRENT_DIR / "dataset_sorted" / "BDD_Jeunes_E1.csv"
 BDD_AGES = CURRENT_DIR / "dataset_sorted" / "BDD_Ages_E1.csv"
 
@@ -100,11 +100,45 @@ def extract_file_info(filename):
 
     return None, None, None
 
+def check_false_start(fpath, max_lines=200):
+    """
+    Lecture rapide du header + quelques lignes pour détecter une colonne 'FalseStart'
+    et savoir si elle contient une valeur True. Retourne True si on doit ignorer.
+    Méthode légère (pas de pandas), tolérante aux séparateurs ';' ou ','.
+    """
+    try:
+        with open(fpath, 'r', encoding='utf-8', errors='ignore') as fh:
+            header = fh.readline()
+            if not header:
+                return False
+            sep = ';' if ';' in header else (',' if ',' in header else ';')
+            cols = [c.strip() for c in header.strip().split(sep)]
+            idx = next((i for i, c in enumerate(cols) if c.lower() == 'falsestart'), None)
+            if idx is None:
+                return False
+            for _ in range(max_lines):
+                line = fh.readline()
+                if not line:
+                    break
+                parts = line.strip().split(sep)
+                if len(parts) <= idx:
+                    continue
+                v = parts[idx].strip().lower()
+                if v in ('true', '1', 'yes', 'y'):
+                    return True
+    except Exception:
+        # En cas d'erreur de lecture on ne bloque pas le traitement général
+        pass
+    return False
+
 def test_performance(dataset_dir, bdd_path):
     """
     Teste la performance de estimate_walking_parameters sur tout le dataset.
     """
-    # Charger la vérité terrain
+
+    # ========== Préparation des données ========== #
+
+    # Charger la BDD et la vérité terrain
     print(f"📖 Chargement de la BDD: {bdd_path.name}")
     ground_truth = load_ground_truth(bdd_path)
     print(f"   {len(ground_truth)} participants chargés")
@@ -127,12 +161,27 @@ def test_performance(dataset_dir, bdd_path):
         'not_found_in_bdd': [],
         'extra_trials': [],  # Essais > 3
         'errors': [],
-        'skipped': 0
+        'skipped': 0,
+        'large_diffs': [],  # fichiers avec écart > 3 ou < -3
+        'false_start_skipped': []  # fichiers ignorés à cause de FalseStart=True
     }
     
     # Traiter chaque fichier
     for fpath in files:
         filename = fpath.name
+        # Vérification rapide et légère de FalseStart (plus fiable/rapide que pd.read_csv pour chaque fichier)
+        try:
+            if check_false_start(fpath):
+                print(f"⏭️  Ignoré (FalseStart=True) : {filename}")
+                results['false_start_skipped'].append({'file': filename})
+                results['skipped'] += 1
+                continue
+        except Exception as e:
+            print(f"⚠️  Erreur vérification FalseStart pour {filename}: {e}")
+            results['errors'].append({'file': filename, 'error': f"FalseStart check error: {e}"})
+            results['skipped'] += 1
+            continue
+
         participant_id, id_test, essai = extract_file_info(filename)
         
         if not participant_id or not id_test:
@@ -172,9 +221,9 @@ def test_performance(dataset_dir, bdd_path):
         
         real_steps = ground_truth[participant_id][(id_test, essai)]
         
-        # Exécuter l'estimation
+        # ========== Exécuter l'estimation ========== #
         try:
-            metrics = estimate_walking_parameters(str(fpath), plot=False, print_results=False)
+            metrics = estimate_walking_parameters(str(fpath), smoothing_method='passe-bas', smoothing_kwargs={'fs':10.0,'fc':1.0}, plot=False, print_results=False)
             detected_steps = metrics['n_steps']
             
             results['total'] += 1
@@ -183,6 +232,17 @@ def test_performance(dataset_dir, bdd_path):
                 results['success'] += 1
                 print(f"✅ {filename}: {detected_steps} pas (correct)")
             else:
+                diff = detected_steps - real_steps
+                if abs(diff) > 3:
+                    results['large_diffs'].append({
+                        'file': filename,
+                        'participant': participant_id,
+                        'test': id_test,
+                        'essai': essai,
+                        'detected': detected_steps,
+                        'real': real_steps,
+                        'diff': diff
+                    })
                 results['failures'].append({
                     'file': filename,
                     'participant': participant_id,
@@ -190,9 +250,9 @@ def test_performance(dataset_dir, bdd_path):
                     'essai': essai,
                     'detected': detected_steps,
                     'real': real_steps,
-                    'diff': detected_steps - real_steps
+                    'diff': diff
                 })
-                print(f"❌ {filename}: {detected_steps} pas détectés, {real_steps} réels (diff: {detected_steps - real_steps:+d})")
+                print(f"❌ {filename}: {detected_steps} pas détectés, {real_steps} réels (diff: {diff:+d})")
         
         except Exception as e:
             results['errors'].append({
@@ -203,6 +263,7 @@ def test_performance(dataset_dir, bdd_path):
             print(f"⚠️  Erreur sur {filename}: {e}")
     
     return results
+
 
 def print_summary(results):
     """
@@ -226,6 +287,20 @@ def print_summary(results):
         print("\n⚠️  Aucun fichier testé")
         print(f"⏭️  Fichiers ignorés: {skipped}")
 
+    # Écrire les fichiers avec écart important (>3 ou <-3) dans un fichier .txt
+    large = results.get('large_diffs') or []
+    if large:
+        out_path = CURRENT_DIR / f"large_diffs_{DATASET_DIR.name}.txt"
+        try:
+            with open(out_path, 'w', encoding='utf-8') as fh:
+                fh.write("Fichiers avec écart important (|diff| > 3)\n")
+                fh.write("="*60 + "\n")
+                for item in large:
+                    fh.write(f"{item['file']}: détectés={item['detected']}, réels={item['real']}, diff={item['diff']:+d}\n")
+                fh.write("\nTotal: {}\n".format(len(large)))
+            print(f"\n⚠️  {len(large)} fichiers avec écart important écrits dans: {out_path}")
+        except Exception as e:
+            print(f"\n⚠️  Impossible d'écrire le fichier des écarts importants: {e}")
 
 def main():
     # Vérifier l'existence des fichiers
