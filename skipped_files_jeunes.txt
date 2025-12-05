@@ -1,8 +1,0 @@
-Fichiers ignorés (non trouvés dans BDD ou erreurs)
-============================================================
-
-ERREURS DE TRAITEMENT:
-------------------------------------------------------------
-Data_p005​_F8W1_1.csv: index 0 is out of bounds for axis 0 with size 0
-
-Total: 1

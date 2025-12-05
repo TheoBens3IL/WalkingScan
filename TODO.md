@@ -55,3 +55,38 @@ ____
 **A faire**
 - [X] faire un script d'analyse du taux de bonne réponse en fonction de la BDD correspondant à chaque fichier
 - [ ] Comprendre pourquoi le taux de réussite est si bas
+
+
+___
+
+**Méthodes envisagées pour le temps réel :**
+- Comparaison des voisins
+- Prominence
+- Z-score d'écart-type
+
+Position Y (m):
+ 2.0 ●     ●     ●  ← Pics de pas (tendance croissante)
+    / \   / \   / \
+ 1.5/   \ /   \ /   \
+   ●     ●     ●     ← Creux
+
+
+
+Prominence = hauteur_pic - max(min_gauche, min_droite)
+
+Exemple visuel :
+     ●  ← pic (y=1.8)
+    / \
+   /   \
+  /     \___  ← creux droit (y=1.5)
+_/           
+ ← creux gauche (y=1.4)
+
+Prominence = 1.8 - max(1.4, 1.5) = 1.8 - 1.5 = 0.3
+
+
+
+__
+
+A faire :
+- Vitesse actuelle en temps réel dans le update

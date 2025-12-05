@@ -12,8 +12,8 @@ from validation_utils import (
 
 # Configuration
 CURRENT_DIR = Path(__file__).resolve().parent
-DATASET_DIR = CURRENT_DIR / "dataset_sorted" / "jeunes"
-# DATASET_DIR = CURRENT_DIR / "dataset_sorted" / "âgés"
+# DATASET_DIR = CURRENT_DIR / "dataset_sorted" / "jeunes"
+DATASET_DIR = CURRENT_DIR / "dataset_sorted" / "âgés"
 BDD_JEUNES = CURRENT_DIR / "dataset_sorted" / "BDD_Jeunes_E1.csv"
 BDD_AGES = CURRENT_DIR / "dataset_sorted" / "BDD_Ages_E1.csv"
 MAUVAIS_ESSAIS = CURRENT_DIR / "dataset_sorted" / "Mauvais_Essais.csv"
@@ -94,21 +94,17 @@ def test_performance(dataset_dir, bdd_path, excluded_files=None):
             continue
         
         if (id_test, essai) not in ground_truth[participant_id]:
-            if essai > 3:
-                print(f"⚠️  Test sans vérité terrain: {filename} (essai {essai})")
-                real_steps = None
-            else:
-                results['not_found_in_bdd'].append({
-                    'file': filename,
-                    'participant': participant_id,
-                    'test': id_test,
-                    'essai': essai,
-                    'reason': 'Test/essai non trouvé dans BDD'
-                })
-                results['skipped'] += 1
-                continue
-        else:
-            real_steps = ground_truth[participant_id][(id_test, essai)]
+            results['not_found_in_bdd'].append({
+                'file': filename,
+                'participant': participant_id,
+                'test': id_test,
+                'essai': essai,
+                'reason': 'Test/essai non trouvé dans BDD'
+            })
+            results['skipped'] += 1
+            continue
+        
+        real_steps = ground_truth[participant_id][(id_test, essai)]
         
         # Exécuter l'estimation
         try:
@@ -122,26 +118,16 @@ def test_performance(dataset_dir, bdd_path, excluded_files=None):
             detected_steps = metrics['n_steps']
             results['total'] += 1
             
-            if real_steps is not None:
-                diff = detected_steps - real_steps
-                if diff == 0 or diff == -1:
-                    results['success'] += 1
-                    if diff == 0:
-                        print(f"✅ {filename}: {detected_steps} pas (correct)")
-                    else:
-                        print(f"✅ {filename}: {detected_steps} pas détectés, {real_steps} réels (toléré: -1)")
+            diff = detected_steps - real_steps
+            if diff == 0 or diff == -1:
+                results['success'] += 1
+                if diff == 0:
+                    print(f"✅ {filename}: {detected_steps} pas (correct)")
                 else:
-                    if abs(diff) > 3:
-                        results['large_diffs'].append({
-                            'file': filename,
-                            'participant': participant_id,
-                            'test': id_test,
-                            'essai': essai,
-                            'detected': detected_steps,
-                            'real': real_steps,
-                            'diff': diff
-                        })
-                    results['failures'].append({
+                    print(f"✅ {filename}: {detected_steps} pas détectés, {real_steps} réels (toléré: -1)")
+            else:
+                if abs(diff) > 3:
+                    results['large_diffs'].append({
                         'file': filename,
                         'participant': participant_id,
                         'test': id_test,
@@ -150,9 +136,16 @@ def test_performance(dataset_dir, bdd_path, excluded_files=None):
                         'real': real_steps,
                         'diff': diff
                     })
-                    print(f"❌ {filename}: {detected_steps} pas détectés, {real_steps} réels (diff: {diff:+d})")
-            else:
-                print(f"ℹ️  {filename}: {detected_steps} pas détectés (pas de vérité terrain)")
+                results['failures'].append({
+                    'file': filename,
+                    'participant': participant_id,
+                    'test': id_test,
+                    'essai': essai,
+                    'detected': detected_steps,
+                    'real': real_steps,
+                    'diff': diff
+                })
+                print(f"❌ {filename}: {detected_steps} pas détectés, {real_steps} réels (diff: {diff:+d})")
         
         except Exception as e:
             results['errors'].append({'file': filename, 'error': str(e)})
@@ -196,7 +189,7 @@ def print_summary(results):
         if participant_not_found > 0:
             print(f"      - {participant_not_found} participants absents")
         if trial_not_found > 0:
-            print(f"      - {trial_not_found} essais absents (ex: essai 4+ non dans BDD)")
+            print(f"      - {trial_not_found} essais absents")
     if errors:
         print(f"   • {len(errors)} erreurs de traitement")
     
@@ -252,7 +245,7 @@ def main():
 
     print("========== Démarrage des tests de performance ==========\n")
 
-    col_name = 'Âgés' if 'âgés' in str(DATASET_DIR).lower() else 'Jeunes'
+    col_name = 'Ages' if 'âgés' in str(DATASET_DIR).lower() else 'Jeunes'
     excluded_files = load_excluded_files(MAUVAIS_ESSAIS, col_name)
     if excluded_files:
         print(f"📋 {len(excluded_files)} fichiers exclus chargés depuis Mauvais_Essais.csv (colonne {col_name})\n")

@@ -17,5 +17,5 @@ def test_estimate_walking_parameters(filename, skip_rows=0):
 
 if __name__ == "__main__":
 
-    file = "Data_p020​_Marche_3.csv"
+    file = "Data_pa010​_TUG1_2.csv"
     test_estimate_walking_parameters(file)
