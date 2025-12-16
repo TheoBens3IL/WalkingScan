@@ -951,7 +951,7 @@ public class RealtimeStepDetector : MonoBehaviour
         ExportData(path);
     }
 
-    // OPTIONNEL: Ajouter une touche pour exporter manuellement
+    // OPTIONNEL: Ajout d'une touche pour exporter manuellement
     void LateUpdate()
     {
         if (Input.GetKeyDown(KeyCode.E))
