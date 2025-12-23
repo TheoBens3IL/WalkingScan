@@ -3,32 +3,16 @@ import re
 import functools
 import pandas as pd
 
-# Mapping: colonne BDD -> (ID_Test, numéro essai)
+# Mapping: préfixe colonne BDD -> ID_Test
 COLUMN_MAPPING = {
-    'NP.MS1.XR': ('Marche', 1),
-    'NP.MS2.XR': ('Marche', 2),
-    'NP.MS3.XR': ('Marche', 3),
-    'NP.MSDT1.XR': ('Marche2', 1),
-    'NP.MSDT2.XR': ('Marche2', 2),
-    'NP.MSDT3.XR': ('Marche2', 3),
-    'NP.F81.XR': ('F8W1', 1),
-    'NP.F82.XR': ('F8W1', 2),
-    'NP.F83.XR': ('F8W1', 3),
-    'NP.F8DT1.XR': ('F8W2', 1),
-    'NP.F8DT2.XR': ('F8W2', 2),
-    'NP.F8DT3.XR': ('F8W2', 3),
-    'NP.TUG1.XR': ('TUG1', 1),
-    'NP.TUG2.XR': ('TUG1', 2),
-    'NP.TUG3.XR': ('TUG1', 3),
-    'NP.TUGDT1.XR': ('TUG2', 1),
-    'NP.TUGDT2.XR': ('TUG2', 2),
-    'NP.TUGDT3.XR': ('TUG2', 3),
-    'NP.FO1.XR': ('FO1', 1),
-    'NP.FO2.XR': ('FO1', 2),
-    'NP.FO3.XR': ('FO1', 3),
-    'NP.FODT1.XR': ('FO2', 1),
-    'NP.FODT2.XR': ('FO2', 2),
-    'NP.FODT3.XR': ('FO2', 3),
+    'NP.MS': 'Marche',
+    'NP.MSDT': 'Marche2',
+    'NP.F8': 'F8W1',
+    'NP.F8DT': 'F8W2',
+    'NP.TUG': 'TUG1',
+    'NP.TUGDT': 'TUG2',
+    'NP.FO': 'FO1',
+    'NP.FODT': 'FO2',
 }
 
 # dossier dataset_sorted (assumé au même niveau que les autres modules)
@@ -62,15 +46,25 @@ def load_bdd_cached(kind: str):
             participant_id = raw_id
         ground_truth[participant_id] = {}
         
-        for col, (id_test, essai) in COLUMN_MAPPING.items():
-            if col in df.columns:
-                nbr_pas = row[col]
-                if pd.notna(nbr_pas):
-                    try:
-                        nbr_pas_int = int(float(nbr_pas))
-                        ground_truth[participant_id][(id_test, essai)] = nbr_pas_int
-                    except (ValueError, TypeError):
-                        pass
+        # Chercher toutes les colonnes qui correspondent au pattern NP.*[0-9]+.XR
+        for col in df.columns:
+            # Pattern: NP.<test><essai>.XR (ex: NP.MS1.XR, NP.F810.XR)
+            pattern = r'^(NP\.[A-Z]+)(\d+)\.XR$'
+            match = re.match(pattern, col)
+            if match:
+                prefix = match.group(1)  # Ex: "NP.MS"
+                essai = int(match.group(2))  # Ex: 1, 2, 3, ou tout autre nombre
+                
+                # Vérifier si le préfixe est dans notre mapping
+                if prefix in COLUMN_MAPPING:
+                    id_test = COLUMN_MAPPING[prefix]
+                    nbr_pas = row[col]
+                    if pd.notna(nbr_pas):
+                        try:
+                            nbr_pas_int = int(float(nbr_pas))
+                            ground_truth[participant_id][(id_test, essai)] = nbr_pas_int
+                        except (ValueError, TypeError):
+                            pass
     return ground_truth
 
 def extract_file_info_from_name(filename: str):

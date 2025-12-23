@@ -8,7 +8,9 @@ using System.Linq;
 /// Détection de la longueur des pas et de la vitesse entre chaque pas
 /// AJOUT: Détection de virages (gauche/droite) basée sur la rotation du casque
 /// AJOUT: Analyse de la symétrie de marche (orientation tête + trajectoire)
-/// AJOUT: Détection de la vitesse actuelle
+/// AJOUT: Détection de la vitesse actuelle instantanée (indépendante des pas)
+/// Utilise un filtre passe-bas IIR Butterworth 2nd order pour lisser les données verticales
+/// Utilise des buffers circulaires pour stocker les données en temps réel
 /// </summary>
 public enum TurnDirection { None, Left, Right }
 
@@ -30,11 +32,13 @@ public class RealtimeStepDetector : MonoBehaviour
     // Parametres de detection des pas
     // ----------------------------------------------------------------------
     [Header("Paramètres de détection de pas")]
-    [SerializeField] private float prominence = 0.005f;         // Profondeur minimale des creux (m)
-    [SerializeField] private float amplitudeThreshold = 0.008f; // Différence minimale du creux par rapport à la moyenne locale (m)
-    [SerializeField] private float minPeakDistance = 0.2f;      // Temps minimal entre deux pas (s)
-    [SerializeField] private int validationWindow = 20;         // Taille de la fenêtre d'analyse : Nombre d'échantillons avant/après pour valider un creux
-    [SerializeField] private float minStepDistance = 0.05f;     // Distance horizontale minimale pour valider un pas
+    [SerializeField] private float prominence = 0.005f;           // Profondeur minimale des creux (m)
+    [SerializeField] private float amplitudeThreshold = 0.008f;   // Différence minimale du creux par rapport à la moyenne locale (m)
+    [SerializeField] private float minPeakDistance = 0.2f;        // Temps minimal entre deux pas (s)
+    [SerializeField] private int validationWindow = 20;           // Taille de la fenêtre d'analyse : Nombre d'échantillons avant/après pour valider un creux
+    [SerializeField] private float minStepDistance = 0.05f;       // Distance horizontale minimale pour valider un pas                                           
+    [SerializeField] private float maxYVariationThreshold = 0.2f; // Seuil maximal de variation sur l'axe Y entre deux pas consécutifs
+
 
     // ----------------------------------------------------------------------
     // Parametres de detection des virages
@@ -58,7 +62,7 @@ public class RealtimeStepDetector : MonoBehaviour
     [Header("Paramètres de filtrage passe-bas")]
     [SerializeField] private float cutoffFrequency = 2.0f;      // Fréquence de coupure (Hz)
     [SerializeField] private float samplingRate = 100.0f;       // Fréquence d'échantillonnage (Hz)
-    
+
     // ----------------------------------------------------------------------
     // Buffers temps reel
     // ----------------------------------------------------------------------
@@ -107,7 +111,7 @@ public class RealtimeStepDetector : MonoBehaviour
     private CircularBuffer<float> zRaw;          // Données brutes Z du casque
     private CircularBuffer<float> timestamps;    // Timestamps des échantillons
     private CircularBuffer<float> headingAngles; // Angles de direction (YAW)
-    private CircularBuffer<float> rollAngles;    // NOUVEAU: Angles d'inclinaison latérale (ROLL)
+    private CircularBuffer<float> rollAngles;    // Angles d'inclinaison latérale (ROLL)
 
     // Filtre passe-bas IIR Butterworth 2nd order
     private float[] xPrev = new float[3];
@@ -279,7 +283,7 @@ public class RealtimeStepDetector : MonoBehaviour
         {
             stepDist = detectedSteps[detectedSteps.Count - 1].stepDistance;
         }
-        
+
         float calculatedStepSpeed = CalculateWalkingSpeed();
 
         rawDataBuffer.Add(new RawDataPoint
@@ -378,21 +382,23 @@ public class RealtimeStepDetector : MonoBehaviour
     /// </summary>
     private void DetectStepsAsMinima()
     {
-        int n = yFiltered.Count;
-        int index = n - validationWindow - 1;
+        // Vérification position dans buffer
+        int index = yFiltered.Count - validationWindow - 1;
+        if (index < validationWindow || index >= n - validationWindow)
+            return;
 
         if (index < validationWindow || index >= n - validationWindow)
             return;
 
+        // Vérification anti-duplication temporelle
         float time = timestamps[index];
-
         if (detectedPeakTimestamps.Any(t => Mathf.Abs(t - time) < 0.01f))
             return;
 
-        if (!IsLocalMinimum(index)) return;
-        if (!IsValidProminence(index)) return;
-        if (!IsValidAmplitude(index)) return;
-        if (!IsValidStepDistance(index)) return;
+        if (!IsLocalMinimum(index)) return;       // Minimum local (dérivée nulle)
+        if (!IsValidProminence(index)) return;    // Prominence suffisante
+        if (!IsValidAmplitude(index)) return;     // Amplitude locale suffisante par rapport à moyenne
+        if (!IsValidStepDistance(index)) return;  // Distance horizontale suffisante
 
         RegisterStep(index, time);
     }
@@ -467,6 +473,25 @@ public class RealtimeStepDetector : MonoBehaviour
     /// </summary>
     private void RegisterStep(int index, float time)
     {
+        // Vérification de la variation Y par rapport au dernier pas enregistré
+        if (detectedSteps.Count > 0)
+        {
+            // Dernière position sur l'axe Y
+            float lastY = detectedPeakPositions[detectedPeakPositions.Count - 1].y;
+
+            // Position Y actuelle
+            float currentY = yFiltered[index];
+
+            // Si la différence sur l'axe Y dépasse le seuil, on ne compte pas ce pas
+            if (Mathf.Abs(currentY - lastY) > maxYVariationThreshold)
+            {
+                // Si la variation est trop grande, on ne compte pas ce pas
+                Debug.Log($"[StepDetector] Variation trop grande sur l'axe Y ({Mathf.Abs(currentY - lastY)} m), pas ajouté.");
+                return;
+            }
+        }
+
+        // Si la variation est acceptable, on continue à enregistrer le pas
         stepCount++;
 
         Vector3 pos = new Vector3(xRaw[index], yFiltered[index], zRaw[index]);
@@ -491,6 +516,7 @@ public class RealtimeStepDetector : MonoBehaviour
         UpdateSpeedDisplay();           // Met à jour vitesse entre pas
         UpdateStepDistanceDisplay(dist);
     }
+
 
 
     // ======================================================================
@@ -846,7 +872,7 @@ public class RealtimeStepDetector : MonoBehaviour
 
         // Couleur selon le PIRE des deux scores
         float minScore = Mathf.Min(headOrientationScore, trajectoryLinearity);
-        
+
         if (minScore >= 80f)
             symmetryText.color = Color.green;
         else if (minScore >= 60f)
@@ -919,7 +945,7 @@ public class RealtimeStepDetector : MonoBehaviour
                 foreach (var p in rawDataBuffer)
                 {
                     // Code virage: 0=Aucun, L=Gauche, R=Droite
-                    string turnCode = 
+                    string turnCode =
                         p.turnStatus == TurnDirection.Left ? "L" :
                         p.turnStatus == TurnDirection.Right ? "R" : "0";
 
@@ -946,17 +972,17 @@ public class RealtimeStepDetector : MonoBehaviour
     void OnApplicationQuit()
     {
         // Export automatique à la fermeture de l'application
-        string path = System.IO.Path.Combine(Application.persistentDataPath, 
+        string path = System.IO.Path.Combine(Application.persistentDataPath,
             $"WalkingDataSymmetry_{System.DateTime.Now:yyyyMMdd_HHmms}.csv");
         ExportData(path);
     }
 
-    // OPTIONNEL: Ajout d'une touche pour exporter manuellement
+    // OPTIONNEL: Ajouter une touche pour exporter manuellement
     void LateUpdate()
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            string path = System.IO.Path.Combine(Application.persistentDataPath, 
+            string path = System.IO.Path.Combine(Application.persistentDataPath,
                 $"WalkingDataSymmetry_{System.DateTime.Now:yyyyMMdd_HHmms}.csv");
             ExportData(path);
             Debug.Log($"[StepDetector] Export manuel vers: {path}");
