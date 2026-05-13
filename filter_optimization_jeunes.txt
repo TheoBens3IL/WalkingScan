@@ -1,0 +1,325 @@
+OPTIMISATION DES PARAMÈTRES DE FILTRAGE
+================================================================================
+
+Dataset: jeunes
+
+
+1. median_k5
+------------------------------------------------------------
+Taux de réussite: 259/830 (31.2%)
+Erreurs: 0
+Fichiers ignorés: 50
+
+Échecs (571):
+  Data_p001​_F8W1_3.csv: détectés=10, réels=9 (diff=+1)
+  Data_p001​_F8W2_1.csv: détectés=11, réels=10 (diff=+1)
+  Data_p001​_F8W2_2.csv: détectés=10, réels=9 (diff=+1)
+  Data_p001​_F8W2_3.csv: détectés=11, réels=10 (diff=+1)
+  Data_p001​_FO1_2.csv: détectés=10, réels=9 (diff=+1)
+  Data_p001​_FO1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO2_1.csv: détectés=12, réels=11 (diff=+1)
+  Data_p001​_Marche2_1.csv: détectés=11, réels=10 (diff=+1)
+  Data_p001​_TUG1_1.csv: détectés=7, réels=9 (diff=-2)
+  Data_p001​_TUG1_2.csv: détectés=7, réels=9 (diff=-2)
+  ... et 561 autres
+
+
+2. savgol_w13_p3
+------------------------------------------------------------
+Taux de réussite: 252/830 (30.4%)
+Erreurs: 1
+Fichiers ignorés: 50
+
+Échecs (577):
+  Data_p001​_F8W1_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_1.csv: détectés=11, réels=10 (diff=+1)
+  Data_p001​_FO1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO2_1.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_FO2_2.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_FO2_3.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_Marche_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_Marche_2.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_TUG1_1.csv: détectés=7, réels=9 (diff=-2)
+  ... et 567 autres
+
+
+3. savgol_w9_p3
+------------------------------------------------------------
+Taux de réussite: 248/830 (29.9%)
+Erreurs: 1
+Fichiers ignorés: 50
+
+Échecs (581):
+  Data_p001​_F8W1_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_1.csv: détectés=11, réels=10 (diff=+1)
+  Data_p001​_FO1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO2_1.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_FO2_3.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_Marche_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_Marche_2.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_TUG1_1.csv: détectés=7, réels=9 (diff=-2)
+  Data_p001​_TUG1_2.csv: détectés=7, réels=9 (diff=-2)
+  ... et 571 autres
+
+
+4. savgol_w11_p3
+------------------------------------------------------------
+Taux de réussite: 247/830 (29.8%)
+Erreurs: 1
+Fichiers ignorés: 50
+
+Échecs (582):
+  Data_p001​_F8W1_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_1.csv: détectés=11, réels=10 (diff=+1)
+  Data_p001​_FO1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO2_1.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_FO2_2.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_FO2_3.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_Marche_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_Marche_2.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_TUG1_1.csv: détectés=7, réels=9 (diff=-2)
+  ... et 572 autres
+
+
+5. savgol_w7_p3
+------------------------------------------------------------
+Taux de réussite: 238/830 (28.7%)
+Erreurs: 1
+Fichiers ignorés: 50
+
+Échecs (591):
+  Data_p001​_F8W1_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_1.csv: détectés=11, réels=10 (diff=+1)
+  Data_p001​_FO1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO2_1.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_FO2_3.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_Marche_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_Marche_2.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_TUG1_1.csv: détectés=7, réels=9 (diff=-2)
+  Data_p001​_TUG1_2.csv: détectés=7, réels=9 (diff=-2)
+  Data_p001​_TUG1_3.csv: détectés=6, réels=8 (diff=-2)
+  ... et 581 autres
+
+
+6. gaussian_sigma1.5
+------------------------------------------------------------
+Taux de réussite: 235/830 (28.3%)
+Erreurs: 1
+Fichiers ignorés: 50
+
+Échecs (594):
+  Data_p001​_F8W1_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO2_1.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_FO2_2.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_FO2_3.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_Marche2_1.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_Marche_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_Marche_2.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_TUG1_1.csv: détectés=7, réels=9 (diff=-2)
+  ... et 584 autres
+
+
+7. passe-bas_fc3.0
+------------------------------------------------------------
+Taux de réussite: 234/830 (28.2%)
+Erreurs: 1
+Fichiers ignorés: 50
+
+Échecs (595):
+  Data_p001​_F8W1_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_1.csv: détectés=11, réels=10 (diff=+1)
+  Data_p001​_F8W2_2.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_3.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_FO1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO2_2.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_Marche2_1.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_Marche2_2.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_Marche_1.csv: détectés=8, réels=9 (diff=-1)
+  ... et 585 autres
+
+
+8. passe-bas_fc2.5
+------------------------------------------------------------
+Taux de réussite: 230/830 (27.7%)
+Erreurs: 1
+Fichiers ignorés: 50
+
+Échecs (599):
+  Data_p001​_F8W1_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_Marche2_1.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_Marche_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_Marche_2.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_TUG1_1.csv: détectés=7, réels=9 (diff=-2)
+  Data_p001​_TUG1_2.csv: détectés=7, réels=9 (diff=-2)
+  Data_p001​_TUG1_3.csv: détectés=6, réels=8 (diff=-2)
+  Data_p001​_TUG2_2.csv: détectés=9, réels=10 (diff=-1)
+  ... et 589 autres
+
+
+9. gaussian_sigma2.0
+------------------------------------------------------------
+Taux de réussite: 226/830 (27.2%)
+Erreurs: 1
+Fichiers ignorés: 50
+
+Échecs (603):
+  Data_p001​_F8W1_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_2.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_3.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_FO1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO2_1.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_FO2_2.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_FO2_3.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_Marche2_1.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_Marche2_2.csv: détectés=9, réels=10 (diff=-1)
+  ... et 593 autres
+
+
+10. gaussian_sigma2.5
+------------------------------------------------------------
+Taux de réussite: 210/830 (25.3%)
+Erreurs: 1
+Fichiers ignorés: 50
+
+Échecs (619):
+  Data_p001​_F8W1_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_2.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_3.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_FO1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO2_1.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_FO2_2.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_FO2_3.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_Marche2_1.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_Marche2_2.csv: détectés=9, réels=10 (diff=-1)
+  ... et 609 autres
+
+
+11. gaussian_sigma3.0
+------------------------------------------------------------
+Taux de réussite: 197/830 (23.7%)
+Erreurs: 1
+Fichiers ignorés: 50
+
+Échecs (632):
+  Data_p001​_F8W1_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_2.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_3.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_FO1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO2_1.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_FO2_2.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_FO2_3.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_Marche2_1.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_Marche2_2.csv: détectés=9, réels=10 (diff=-1)
+  ... et 622 autres
+
+
+12. passe-bas_fc2.0
+------------------------------------------------------------
+Taux de réussite: 192/830 (23.1%)
+Erreurs: 1
+Fichiers ignorés: 50
+
+Échecs (637):
+  Data_p001​_F8W1_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_1.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_F8W2_2.csv: détectés=10, réels=9 (diff=+1)
+  Data_p001​_FO1_2.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO2_1.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_FO2_2.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_FO2_3.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_Marche2_1.csv: détectés=9, réels=10 (diff=-1)
+  ... et 627 autres
+
+
+13. passe-bas_fc1.8
+------------------------------------------------------------
+Taux de réussite: 151/830 (18.2%)
+Erreurs: 1
+Fichiers ignorés: 50
+
+Échecs (678):
+  Data_p001​_F8W1_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_F8W2_2.csv: détectés=10, réels=9 (diff=+1)
+  Data_p001​_FO1_1.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO1_2.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO1_3.csv: détectés=8, réels=9 (diff=-1)
+  Data_p001​_FO2_1.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_FO2_2.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_FO2_3.csv: détectés=10, réels=11 (diff=-1)
+  Data_p001​_Marche2_1.csv: détectés=9, réels=10 (diff=-1)
+  ... et 668 autres
+
+
+14. passe-bas_fc1.5
+------------------------------------------------------------
+Taux de réussite: 105/830 (12.7%)
+Erreurs: 1
+Fichiers ignorés: 50
+
+Échecs (724):
+  Data_p001​_F8W1_1.csv: détectés=7, réels=9 (diff=-2)
+  Data_p001​_F8W1_2.csv: détectés=7, réels=9 (diff=-2)
+  Data_p001​_F8W1_3.csv: détectés=6, réels=9 (diff=-3)
+  Data_p001​_F8W2_1.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_F8W2_2.csv: détectés=10, réels=9 (diff=+1)
+  Data_p001​_F8W2_3.csv: détectés=9, réels=10 (diff=-1)
+  Data_p001​_FO1_1.csv: détectés=7, réels=9 (diff=-2)
+  Data_p001​_FO1_2.csv: détectés=7, réels=9 (diff=-2)
+  Data_p001​_FO1_3.csv: détectés=7, réels=9 (diff=-2)
+  Data_p001​_FO2_1.csv: détectés=10, réels=11 (diff=-1)
+  ... et 714 autres
+
+
+15. median_k7
+------------------------------------------------------------
+Taux de réussite: 59/830 (7.1%)
+Erreurs: 0
+Fichiers ignorés: 50
+
+Échecs (771):
+  Data_p001​_F8W1_1.csv: détectés=10, réels=9 (diff=+1)
+  Data_p001​_F8W1_2.csv: détectés=14, réels=9 (diff=+5)
+  Data_p001​_F8W1_3.csv: détectés=10, réels=9 (diff=+1)
+  Data_p001​_F8W2_1.csv: détectés=12, réels=10 (diff=+2)
+  Data_p001​_F8W2_2.csv: détectés=12, réels=9 (diff=+3)
+  Data_p001​_F8W2_3.csv: détectés=12, réels=10 (diff=+2)
+  Data_p001​_FO1_1.csv: détectés=15, réels=9 (diff=+6)
+  Data_p001​_FO1_2.csv: détectés=13, réels=9 (diff=+4)
+  Data_p001​_FO1_3.csv: détectés=10, réels=9 (diff=+1)
+  Data_p001​_FO2_1.csv: détectés=15, réels=11 (diff=+4)
+  ... et 761 autres
+
+
+16. median_k9
+------------------------------------------------------------
+Taux de réussite: 17/830 (2.0%)
+Erreurs: 0
+Fichiers ignorés: 50
+
+Échecs (813):
+  Data_p001​_F8W1_1.csv: détectés=13, réels=9 (diff=+4)
+  Data_p001​_F8W1_2.csv: détectés=14, réels=9 (diff=+5)
+  Data_p001​_F8W1_3.csv: détectés=12, réels=9 (diff=+3)
+  Data_p001​_F8W2_1.csv: détectés=14, réels=10 (diff=+4)
+  Data_p001​_F8W2_2.csv: détectés=14, réels=9 (diff=+5)
+  Data_p001​_F8W2_3.csv: détectés=16, réels=10 (diff=+6)
+  Data_p001​_FO1_1.csv: détectés=18, réels=9 (diff=+9)
+  Data_p001​_FO1_2.csv: détectés=17, réels=9 (diff=+8)
+  Data_p001​_FO1_3.csv: détectés=16, réels=9 (diff=+7)
+  Data_p001​_FO2_1.csv: détectés=18, réels=11 (diff=+7)
+  ... et 803 autres
+
